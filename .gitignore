@@ -17,8 +17,9 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# Model files (optional)
+# Model files
 *.joblib
+!student_outcome_model.joblib
 
 # Streamlit cache
 .streamlit/cache/

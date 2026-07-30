@@ -10,7 +10,6 @@ import streamlit as st
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="Student Outcome Predictor",
-    page_icon="🎓",
     layout="wide",
 )
 
@@ -61,7 +60,7 @@ metrics = model_bundle["metrics"]
 # -----------------------------------------------------------------------------
 # Header and model information
 # -----------------------------------------------------------------------------
-st.title("🎓 Student Outcome Predictor")
+st.title("Student Outcome Predictor")
 st.write(
     "This decision-support application uses information available at the end "
     "of Semester 1 to estimate whether a student is likely to **Dropout**, "
@@ -313,6 +312,11 @@ if submitted:
             "Approved curricular units cannot be greater than enrolled units."
         )
 
+    if approved > evaluations:
+        validation_errors.append(
+            "Approved curricular units cannot be greater than the number of evaluations."
+        )
+
     if credited > enrolled:
         validation_errors.append(
             "Credited curricular units cannot be greater than enrolled units."
@@ -323,15 +327,24 @@ if submitted:
             "Units without evaluations cannot be greater than enrolled units."
         )
 
-    if enrolled == 0 and approved > 0:
+    if enrolled == 0 and any(
+        [
+            credited > 0,
+            evaluations > 0,
+            approved > 0,
+            without_evaluations > 0,
+        ]
+    ):
         validation_errors.append(
-            "Approved units must be 0 when enrolled units are 0."
+            "All Semester 1 unit values must be 0 when enrolled units are 0."
         )
 
     if validation_errors:
         st.session_state.pop("prediction_result", None)
+
         for message in validation_errors:
             st.error(message)
+
     else:
         # Begin with the training-data defaults for every feature, then replace
         # the values collected through the user interface.
